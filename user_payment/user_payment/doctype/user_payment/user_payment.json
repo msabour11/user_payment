@@ -18,7 +18,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-05-05 13:00:59.756429",
+ "modified": "2025-05-05 23:31:59.321621",
  "modified_by": "Administrator",
  "module": "User Payment",
  "name": "User Payment",
@@ -41,6 +41,14 @@
    "print": 1,
    "read": 1,
    "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Sales User",
    "share": 1,
    "write": 1
   }

@@ -64,6 +64,7 @@ doctype_js = {"Payment Entry": "public/js/user_payment.js"}
 # 	"Role": "home_page"
 # }
 
+
 # Generators
 # ----------
 
