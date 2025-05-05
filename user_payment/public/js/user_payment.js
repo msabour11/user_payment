@@ -4,12 +4,12 @@ frappe.ui.form.on("Payment Entry", {
       let current_user = frappe.session.user;
 
       frappe.db.get_doc("User Payment").then((doc) => {
-        let user_account = null;
+        var user_account = null;
 
         // Iterate over the child table to find the current user
         doc.user_accounts.forEach((row) => {
           if (row.user === current_user) {
-            user_account = row.account; // Assuming 'account' holds the associated account
+            user_account = row.account; // 'account' holds the associated account
           }
         });
 
@@ -21,8 +21,23 @@ frappe.ui.form.on("Payment Entry", {
               },
             };
           });
+
+          // Store `user_account` in frm for use in other events
+          frm.user_account = user_account;
         }
       });
+    }
+  },
+
+  mode_of_payment: function (frm) {
+    if (
+      frm.user_account && // Now accessing `user_account` from frm
+      (frm.doc.mode_of_payment === "Cash" ||
+        frm.doc.mode_of_payment === "نقد" ||
+        frm.doc.mode_of_payment === "حوالة مصرفية" ||
+        frm.doc.mode_of_payment === "Wire Transfer")
+    ) {
+      frm.set_value("paid_to", frm.user_account);
     }
   },
 });
