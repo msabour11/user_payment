@@ -1,0 +1,51 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-05-05 12:11:02.558563",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "user_accounts"
+ ],
+ "fields": [
+  {
+   "fieldname": "user_accounts",
+   "fieldtype": "Table",
+   "label": "User accounts",
+   "options": "User Payment Table"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-05-05 13:00:59.756429",
+ "modified_by": "Administrator",
+ "module": "User Payment",
+ "name": "User Payment",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
