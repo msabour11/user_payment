@@ -43,7 +43,10 @@ app_license = "mit"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-doctype_js = {"Payment Entry": "public/js/user_payment.js"}
+doctype_js = {
+    "Payment Entry": "public/js/user_payment.js",
+    "Sales Invoice": "public/js/commission_sales_invoic.js",
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -133,6 +136,11 @@ doctype_js = {"Payment Entry": "public/js/user_payment.js"}
 # override_doctype_class = {
 # 	"ToDo": "custom_app.overrides.CustomToDo"
 # }
+
+
+override_doctype_class = {
+    "Sales Invoice": "user_payment.overrides.commission_sales_invoice.CustomSellingController"
+}
 
 # Document Events
 # ---------------
