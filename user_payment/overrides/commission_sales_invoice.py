@@ -159,3 +159,20 @@ class CustomSellingController(SalesInvoice):
         # Note: Due to the independent setting of commission_rate, this equality may not hold exactly
         # If exact equality is required, commission_rate could be recalculated as (incentives / allocated_amount) * 100
         # after allocated_amount is set, but that would revert to uniform rates
+
+    def validate_sales_team(self, sales_team):
+        sales_persons = [d.sales_person for d in sales_team]
+        print("Sales Persons:", sales_persons)
+
+        if not sales_persons:
+            return
+
+        sales_person_status = frappe.db.get_all(
+            "Sales Person",
+            filters={"name": ["in", sales_persons]},
+            fields=["name", "enabled"],
+        )
+
+        for row in sales_person_status:
+            if not row.enabled:
+                frappe.throw(_("Sales Person <b>{0}</b> is disabled.").format(row.name))
