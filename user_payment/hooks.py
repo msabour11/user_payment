@@ -154,6 +154,27 @@ override_doctype_class = {
 # 	}
 # }
 
+
+# dcoc_events = {
+#     "Salary Slip": {
+#         "on_update": "user_payment.overrides.salary_slip_commission.update_salary_slip_commission",
+#     },
+# }
+
+# ... existing code ...
+
+# Salary Slip Hooks
+# doc_events = {
+#     "Salary Slip": {
+#         "on_update": "user_payment.overrides.salary_slip_commission.add_commission_to_salary_slip",
+#         "before_submit": "user_payment.overrides.salary_slip_commission.add_commission_to_salary_slip",
+#     }
+# }
+
+
+override_doctype_class = {
+    "Salary Slip": "user_payment.overrides.salary_slip_commission.CustomSalarySlip"
+}
 # Scheduled Tasks
 # ---------------
 
