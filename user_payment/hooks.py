@@ -173,7 +173,8 @@ override_doctype_class = {
 
 
 override_doctype_class = {
-    "Salary Slip": "user_payment.overrides.salary_slip_commission.CustomSalarySlip"
+    "Salary Slip": "user_payment.overrides.salary_slip_commission.CustomSalarySlip",
+    "Sales Invoice": "user_payment.overrides.commission_sales_invoice.CustomSellingController",
 }
 # Scheduled Tasks
 # ---------------
