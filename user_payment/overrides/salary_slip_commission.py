@@ -145,8 +145,8 @@ class CustomSalarySlip(OriginalSalarySlip):
 
         # Add total incentives to net pay
         total_incentives = self.calculate_total_incentives()
+        self.custom_sales_commissions = total_incentives
         self.net_pay += total_incentives
-        print(f"Net Pay after adding incentives: {self.net_pay}")
 
         # Recalculate gross_pay and related fields
         self.gross_pay = (self.gross_pay or 0) + total_incentives
