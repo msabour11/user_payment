@@ -46,6 +46,7 @@ app_license = "mit"
 doctype_js = {
     "Payment Entry": "public/js/user_payment.js",
     "Sales Invoice": "public/js/commission_sales_invoic.js",
+    "Additional Salary": "public/js/additional_commission.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -138,9 +139,9 @@ doctype_js = {
 # }
 
 
-override_doctype_class = {
-    "Sales Invoice": "user_payment.overrides.commission_sales_invoice.CustomSellingController"
-}
+# override_doctype_class = {
+#     "Sales Invoice": "user_payment.overrides.commission_sales_invoice.CustomSellingController"
+# }
 
 # Document Events
 # ---------------
@@ -173,7 +174,7 @@ override_doctype_class = {
 
 
 override_doctype_class = {
-    "Salary Slip": "user_payment.overrides.salary_slip_commission.CustomSalarySlip",
+    # "Salary Slip": "user_payment.overrides.salary_slip_commission.CustomSalarySlip",
     "Sales Invoice": "user_payment.overrides.commission_sales_invoice.CustomSellingController",
 }
 # Scheduled Tasks

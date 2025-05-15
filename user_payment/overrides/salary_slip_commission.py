@@ -153,3 +153,30 @@ class CustomSalarySlip(OriginalSalarySlip):
         self.gross_year_to_date = (self.gross_year_to_date or 0) + total_incentives
         self.rounded_total = round(self.net_pay)
         self.total_in_words = money_in_words(self.net_pay, self.currency)
+
+
+@frappe.whitelist()
+def get_commission(employee, start_date, end_date):
+    """
+    Dynamically calculate total incentives for the employee based on sales data.
+    """
+    sales_person = frappe.db.get_value("Sales Person", {"employee": employee}, "name")
+    if not sales_person:
+        return 0
+
+    total_incentives = (
+        frappe.db.sql(
+            """
+        SELECT SUM(te.incentives)
+        FROM `tabSales Invoice` si
+        INNER JOIN `tabSales Team` te ON si.name = te.parent
+        WHERE si.docstatus = 1
+        AND si.posting_date BETWEEN %s AND %s
+        AND te.sales_person = %s
+        """,
+            (start_date, end_date, sales_person),
+        )[0][0]
+        or 0
+    )
+
+    return flt(total_incentives)
