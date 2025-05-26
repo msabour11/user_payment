@@ -78,28 +78,7 @@ frappe.ui.form.on("Sales Invoice", {
       },
     });
   },
-  // add discount percentage to sales invoice based on total quantity
-  validate: function (frm) {
-    // Get the total number of items in the Sales Invoice
-    let total_qty = 0;
 
-    frm.doc.items.forEach((item) => {
-      total_qty += item.qty || 0;
-    });
-
-    console.log("total items", total_qty);
-
-    // Apply discount based on the number of items
-    if (total_qty >= 0 && total_qty < 10) {
-      frm.set_value("additional_discount_percentage", 0); // No discount
-    } else if (total_qty >= 10 && total_qty < 50) {
-      frm.set_value("additional_discount_percentage", 30); // 30% discount
-    } else if (total_qty >= 50 && total_qty < 100) {
-      frm.set_value("additional_discount_percentage", 34); // 34% discount
-    } else if (total_qty >= 100) {
-      frm.set_value("additional_discount_percentage", 35); // 35% discount
-    }
-  },
   // add payment row to sales invoice based on is_cash field
   is_cash: function (frm) {
     if (frm.doc.is_cash) {
@@ -127,4 +106,48 @@ frappe.ui.form.on("Sales Invoice", {
       add_payment_row(frm);
     }
   },
+
+  // total_qty(frm) {
+  //   frappe.msgprint("Total Quantity: " + frm.doc.total_qty);
+  //   calculate_addittion_qty(frm);
+  //   // Get the total number of items in the Sales Invoice
+  // },
 });
+
+frappe.ui.form.on("Sales Invoice Item", {
+  qty(frm) {
+    let total_qty = 0;
+    // Recalculate total quantity when item quantity changes
+    frm.doc.items.forEach((item) => {
+      total_qty += item.qty || 0;
+    });
+
+    // Calculate and set the free quantity based on tiered logic
+    const free_qty = calculate_tiered_free_quantity(frm, total_qty);
+    frappe.msgprint(`Total Quantity: ${total_qty}, Free Quantity: ${free_qty}`);
+  },
+});
+
+function calculate_tiered_free_quantity(frm, total_qty) {
+  if (total_qty < 10) return 0;
+
+  let remaining = total_qty;
+  let free_qty = 0;
+
+  // Tier calculation logic
+  const tiers = [
+    { threshold: 100, rate: 0.35 },
+    { threshold: 50, rate: 0.34 },
+    { threshold: 10, rate: 0.3 },
+  ];
+
+  tiers.forEach((tier) => {
+    if (remaining >= tier.threshold) {
+      const blocks = Math.floor(remaining / tier.threshold);
+      free_qty += Math.floor(blocks * tier.threshold * tier.rate);
+      remaining %= tier.threshold;
+    }
+  });
+
+  return free_qty;
+}
