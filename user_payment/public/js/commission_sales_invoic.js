@@ -45,6 +45,10 @@ function add_payment_row(frm) {
 }
 
 frappe.ui.form.on("Sales Invoice", {
+  Validite(frm) {
+    frm.refresh_field("items");
+    frm.refresh_field("total_qty");
+  },
   // get sales person and fixed rate from sales person doctype
   before_save(frm) {
     const current_user = frappe.session.user;
