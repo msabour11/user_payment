@@ -48,6 +48,12 @@ frappe.ui.form.on("Sales Invoice", {
   Validite(frm) {
     frm.refresh_field("items");
     frm.refresh_field("total_qty");
+    frm.refresh_field("net_total");
+    frm.refresh_field("grand_total");
+    frm.refresh_field("rounded_total");
+    frm.refresh_field("total_taxes_and_charges");
+    frm.refresh_field("total_additional_discount_amount");
+    frm.refresh_field("total_additional_discount_percentage");
   },
   // get sales person and fixed rate from sales person doctype
   before_save(frm) {

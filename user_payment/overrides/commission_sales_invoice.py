@@ -91,7 +91,7 @@ class CustomSellingController(SalesInvoice):
         self.validate_sales_team(sales_team)
 
         # Calculate total quantity of items once
-        total_quantity = sum(item.qty for item in self.items if item.rate> 0)
+        total_quantity = sum(item.qty for item in self.items )
         total_invoice_amount = self.total
 
         # Calculate average unit price
