@@ -374,8 +374,230 @@ def get_product_discount_rule(pricing_rule, item_details, args=None, doc=None):
 
 
 
-# grok
+# add free items to sales invoice
+# import frappe
+# import math
 
+# def calculate_tiered_free_quantity(total_qty):
+#     """Calculate the free quantity based on tiered thresholds and rates."""
+#     if total_qty < 10:
+#         return 0
+#     remaining = total_qty
+#     free_qty = 0
+#     tiers = [
+#         {"threshold": 100, "rate": 0.35},
+#         {"threshold": 50, "rate": 0.34},
+#         {"threshold": 10, "rate": 0.30}
+#     ]
+#     for tier in tiers:
+#         if remaining >= tier["threshold"]:
+#             blocks = remaining // tier["threshold"]
+#             free_qty += math.floor(blocks * tier["threshold"] * tier["rate"])
+#             remaining = remaining % tier["threshold"]
+#     return free_qty
+
+# def get_item_rate(item_code, price_list):
+#     """Fetch the rate of the item from the price list or standard rate."""
+#     rate = frappe.get_value("Item Price", {"item_code": item_code, "price_list": price_list}, "price_list_rate")
+#     if not rate:
+#         rate = frappe.get_value("Item", item_code, "standard_rate")
+#     return rate or 0
+
+# def add_free_items(doc, method):
+#     """Add or update free items in the Sales Invoice and set discount_amount."""
+#     # Calculate total quantity of non-free items
+#     total_qty = sum(item.qty for item in doc.items if not item.get("is_free_discount"))
+
+#     # Calculate expected free quantity based on tiers
+#     expected_free = calculate_tiered_free_quantity(total_qty)
+
+#     # Sum the quantities of free items entered by the user in the discount_item table
+#     user_free_total = sum(d.quantity for d in doc.get("discount_item") or [])
+
+#     # Validate that user-entered free quantity matches the calculated free quantity
+#     if user_free_total != expected_free:
+#         frappe.throw(f"Free items quantity ({user_free_total}) must match calculated tier quantity ({expected_free})")
+
+#     # Get the list of free items to add or update
+#     free_items_to_add = {d.item_code: d.quantity for d in doc.get("discount_item") or []}
+
+#     # Initialize total free items value
+#     total_free_items_value = 0
+
+#     # Update or add free items
+#     for item_code, quantity in free_items_to_add.items():
+#         rate = get_item_rate(item_code, doc.selling_price_list)
+#         if not rate:
+#             frappe.throw(f"No rate found for item {item_code}")
+#         item_uom = frappe.get_value("Item", item_code, "stock_uom")
+#         amount = quantity * rate
+#         if doc.currency == doc.company_currency:
+#             base_rate = rate
+#             base_amount = amount
+#         else:
+#             base_rate = rate * doc.conversion_rate
+#             base_amount = amount * doc.conversion_rate
+#         income_account = frappe.db.get_value("Company", doc.company, "default_income_account")
+#         expense_account = frappe.db.get_value("Company", doc.company, "default_expense_account")
+#         if not income_account:
+#             frappe.throw(f"Default Income Account not set for company {doc.company}")
+#         cost_center = frappe.db.get_value("Company", doc.company, "cost_center")
+#         if not income_account:
+#             frappe.throw(f"Default Income Account not set for company {doc.company}")
+#         if not cost_center:
+#             frappe.throw(f"Default Cost Center not set for company {doc.company}")
+
+#         # Check if there is an existing free item with the same item_code
+#         existing_item = next((item for item in doc.items if item.get("is_free_discount") and item.item_code == item_code), None)
+#         if existing_item:
+#             # Update existing item
+#             existing_item.qty = quantity
+#             existing_item.rate = rate
+#             existing_item.amount = amount
+#             existing_item.base_rate = base_rate
+#             existing_item.base_amount = base_amount
+#         else:
+#             # Add new item
+#             doc.append("items", {
+#                 "item_code": item_code,
+#                 "item_name": f"{item_code} Free Item",
+#                 "qty": quantity,
+#                 "rate": rate,
+#                 "amount": amount,
+#                 "base_rate": base_rate,
+#                 "base_amount": base_amount,
+#                 "uom": item_uom,
+#                 "warehouse": doc.set_warehouse,
+#                 "income_account": income_account,
+#                 "expense_account": expense_account,
+#                 "cost_center": cost_center,
+#                 "is_free_discount": True,
+#                 "conversion_factor": 1  # since uom is stock_uom
+#             })
+#         total_free_items_value += amount
+
+#     # Remove free items that are no longer in discount_item
+#     doc.items = [item for item in doc.items if not item.get("is_free_discount") or item.item_code in free_items_to_add]
+
+#     # Set discount_amount to the total value of free items
+#     doc.discount_amount = total_free_items_value
+
+
+
+# update quantity
+
+# import frappe
+# import math
+
+# def calculate_tiered_free_quantity(total_qty):
+#     """Calculate the free quantity based on tiered thresholds and rates."""
+#     if total_qty < 10:
+#         return 0
+#     remaining = total_qty
+#     free_qty = 0
+#     tiers = [
+#         {"threshold": 100, "rate": 0.35},
+#         {"threshold": 50, "rate": 0.34},
+#         {"threshold": 10, "rate": 0.30}
+#     ]
+#     for tier in tiers:
+#         if remaining >= tier["threshold"]:
+#             blocks = remaining // tier["threshold"]
+#             free_qty += math.floor(blocks * tier["threshold"] * tier["rate"])
+#             remaining = remaining % tier["threshold"]
+#     return free_qty
+
+# def get_item_rate(item_code, price_list):
+#     """Fetch the rate of the item from the price list or standard rate."""
+#     rate = frappe.get_value("Item Price", {"item_code": item_code, "price_list": price_list}, "price_list_rate")
+#     if not rate:
+#         rate = frappe.get_value("Item", item_code, "standard_rate")
+#     return rate or 0
+
+# def add_free_items(doc, method):
+#     """Update item quantities with free items from discount_item and set discount_amount."""
+#     # Step 1: Calculate total paid quantity (excluding free quantities)
+#     total_paid_qty = sum(item.qty for item in doc.items if not item.get("is_free_discount"))
+
+#     # Step 2: Calculate expected free quantity
+#     expected_free = calculate_tiered_free_quantity(total_paid_qty)
+
+#     # Step 3: Sum user-entered free quantities from discount_item
+#     user_free_total = sum(d.quantity for d in doc.get("discount_item") or [])
+
+#     # Step 4: Validate free quantity
+#     if user_free_total != expected_free:
+#         frappe.throw(f"Free items quantity ({user_free_total}) must match calculated tier quantity ({expected_free})")
+
+#     # Step 5: Initialize total free items value for discount_amount
+#     total_free_items_value = 0
+
+#     # Step 6: Process free items from discount_item
+#     free_items_to_add = {d.item_code: d.quantity for d in doc.get("discount_item") or []}
+#     for item_code, free_qty in free_items_to_add.items():
+#         # Fetch item details
+#         rate = get_item_rate(item_code, doc.selling_price_list)
+#         if not rate:
+#             frappe.throw(f"No rate found for item {item_code}")
+#         item_uom = frappe.get_value("Item", item_code, "stock_uom")
+#         income_account = frappe.db.get_value("Company", doc.company, "default_income_account")
+#         expense_account = frappe.db.get_value("Company", doc.company, "default_expense_account")
+#         cost_center = frappe.db.get_value("Company", doc.company, "cost_center")
+#         if not income_account:
+#             frappe.throw(f"Default Income Account not set for company {doc.company}")
+#         if not expense_account:
+#             frappe.throw(f"Default Expense Account not set for company {doc.company}")
+#         if not cost_center:
+#             frappe.throw(f"Default Cost Center not set for company {doc.company}")
+
+#         # Calculate amounts
+#         amount = free_qty * rate
+#         base_rate = rate if doc.currency == doc.company_currency else rate * doc.conversion_rate
+#         base_amount = amount if doc.currency == doc.company_currency else amount * doc.conversion_rate
+
+#         # Check for existing item (non-free)
+#         existing_item = next((item for item in doc.items if item.item_code == item_code and not item.get("is_free_discount")), None)
+#         if existing_item:
+#             # Update existing item's quantity and discount
+#             existing_item.qty += free_qty
+#             existing_item.amount = existing_item.qty * existing_item.rate
+#             existing_item.base_amount = existing_item.amount if doc.currency == doc.company_currency else existing_item.amount * doc.conversion_rate
+#             existing_item.discount_amount = (existing_item.discount_amount or 0) + amount
+#             existing_item.base_discount_amount = existing_item.discount_amount if doc.currency == doc.company_currency else existing_item.discount_amount * doc.conversion_rate
+#         else:
+#             # Add new item for free quantity
+#             doc.append("items", {
+#                 "item_code": item_code,
+#                 "item_name": f"{item_code} Free Item",
+#                 "qty": free_qty,
+#                 "rate": rate,
+#                 "amount": amount,
+#                 "base_rate": base_rate,
+#                 "base_amount": base_amount,
+#                 "discount_amount": amount,  # Full discount for free item
+#                 "base_discount_amount": base_amount,
+#                 "uom": item_uom,
+#                 "warehouse": doc.set_warehouse,
+#                 "income_account": income_account,
+#                 "expense_account": expense_account,
+#                 "cost_center": cost_center,
+#                 "is_free_discount": True,
+#                 "conversion_factor": 1  # Using stock UOM
+#             })
+#         total_free_items_value += amount
+
+#     # Step 7: Remove free items no longer in discount_item
+#     doc.items = [item for item in doc.items if not item.get("is_free_discount") or item.item_code in free_items_to_add]
+
+#     # Step 8: Set discount_amount to the total value of free items
+#     doc.discount_amount = total_free_items_value
+#     # doc.calculate_taxes_and_totals()
+
+
+# advanced so
+
+import frappe
+import math
 
 def calculate_tiered_free_quantity(total_qty):
     """Calculate the free quantity based on tiered thresholds and rates."""
@@ -403,9 +625,9 @@ def get_item_rate(item_code, price_list):
     return rate or 0
 
 def add_free_items(doc, method):
-    """Add or update free items in the Sales Invoice and set discount_amount."""
-    # Calculate total quantity of non-free items
-    total_qty = sum(item.qty for item in doc.items if not item.get("is_free_discount"))
+    """Update existing items with free quantities from discount_item table."""
+    # Calculate total quantity of non-free items (items without free quantities)
+    total_qty = sum(item.qty - (item.get("free_qty") or 0) for item in doc.items)
 
     # Calculate expected free quantity based on tiers
     expected_free = calculate_tiered_free_quantity(total_qty)
@@ -417,66 +639,57 @@ def add_free_items(doc, method):
     if user_free_total != expected_free:
         frappe.throw(f"Free items quantity ({user_free_total}) must match calculated tier quantity ({expected_free})")
 
-    # Get the list of free items to add or update
-    free_items_to_add = {d.item_code: d.quantity for d in doc.get("discount_item") or []}
+    # Get the list of free items from discount_item table
+    free_items_dict = {d.item_code: d.quantity for d in doc.get("discount_item") or []}
 
-    # Initialize total free items value
+    # Initialize total free items value for discount calculation
     total_free_items_value = 0
 
-    # Update or add free items
-    for item_code, quantity in free_items_to_add.items():
-        rate = get_item_rate(item_code, doc.selling_price_list)
-        if not rate:
-            frappe.throw(f"No rate found for item {item_code}")
-        item_uom = frappe.get_value("Item", item_code, "stock_uom")
-        amount = quantity * rate
-        if doc.currency == doc.company_currency:
-            base_rate = rate
-            base_amount = amount
-        else:
-            base_rate = rate * doc.conversion_rate
-            base_amount = amount * doc.conversion_rate
-        income_account = frappe.db.get_value("Company", doc.company, "default_income_account")
-        expense_account = frappe.db.get_value("Company", doc.company, "default_expense_account")
-        if not income_account:
-            frappe.throw(f"Default Income Account not set for company {doc.company}")
-        cost_center = frappe.db.get_value("Company", doc.company, "cost_center")
-        if not income_account:
-            frappe.throw(f"Default Income Account not set for company {doc.company}")
-        if not cost_center:
-            frappe.throw(f"Default Cost Center not set for company {doc.company}")
+    # Reset all free quantities first
+    for item in doc.items:
+        if hasattr(item, 'free_qty'):
+            item.free_qty = 0
 
-        # Check if there is an existing free item with the same item_code
-        existing_item = next((item for item in doc.items if item.get("is_free_discount") and item.item_code == item_code), None)
+    # Process each free item from discount_item table
+    for item_code, free_quantity in free_items_dict.items():
+        # Find existing item in items table
+        existing_item = next((item for item in doc.items if item.item_code == item_code), None)
+        
         if existing_item:
-            # Update existing item
-            existing_item.qty = quantity
-            existing_item.rate = rate
-            existing_item.amount = amount
-            existing_item.base_rate = base_rate
-            existing_item.base_amount = base_amount
+            # Update existing item with free quantity
+            existing_item.free_qty = free_quantity
+            
+            # Calculate the value of free items for discount
+            rate = get_item_rate(item_code, doc.selling_price_list)
+            if not rate:
+                frappe.throw(f"No rate found for item {item_code}")
+            
+            free_amount = free_quantity * rate
+            total_free_items_value += free_amount
+            
+            # Update the item's total quantity to include free quantity
+            # This assumes you want to show total qty including free items
+            # If you want to keep them separate, you can skip this line
+            existing_item.qty = (existing_item.qty or 0) + free_quantity
+            
+            # Recalculate amount based on paid quantity only (excluding free qty)
+            paid_qty = existing_item.qty - free_quantity
+            existing_item.amount = paid_qty * existing_item.rate
+            
+            # Update base amounts for multi-currency
+            if doc.currency == doc.company_currency:
+                existing_item.base_amount = existing_item.amount
+            else:
+                existing_item.base_amount = existing_item.amount * doc.conversion_rate
+                
         else:
-            # Add new item
-            doc.append("items", {
-                "item_code": item_code,
-                "item_name": f"{item_code} Free Item",
-                "qty": quantity,
-                "rate": rate,
-                "amount": amount,
-                "base_rate": base_rate,
-                "base_amount": base_amount,
-                "uom": item_uom,
-                "warehouse": doc.set_warehouse,
-                "income_account": income_account,
-                "expense_account": expense_account,
-                "cost_center": cost_center,
-                "is_free_discount": True,
-                "conversion_factor": 1  # since uom is stock_uom
-            })
-        total_free_items_value += amount
-
-    # Remove free items that are no longer in discount_item
-    doc.items = [item for item in doc.items if not item.get("is_free_discount") or item.item_code in free_items_to_add]
+            # If item doesn't exist in items table, you might want to add it
+            # or throw an error - depending on your business logic
+            frappe.msgprint(f"Item {item_code} not found in items table. Free quantity will be ignored.")
 
     # Set discount_amount to the total value of free items
     doc.discount_amount = total_free_items_value
+
+    # Optional: Add a custom field to track free items value
+    if hasattr(doc, 'free_items_value'):
+        doc.free_items_value = total_free_items_value

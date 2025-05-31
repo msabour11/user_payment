@@ -160,9 +160,9 @@ doc_events = {
     # "Salary Slip": {
     #     "on_update": "user_payment.overrides.salary_slip_commission.update_salary_slip_commission",
     # },
-    "Sales Invoice": {
-        "validate": "user_payment.overrides.product_discount.add_free_items",
-    },
+    # "Sales Invoice": {
+    #     "before_save": "user_payment.overrides.product_discount.add_free_items",
+    # },
 }
 
 # ... existing code ...
