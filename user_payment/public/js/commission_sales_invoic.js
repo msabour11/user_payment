@@ -501,10 +501,9 @@ function calculate_discount_amount(frm) {
         }
       }
     });
+    frm.set_value("discount_amount", total_discount_amount);
+    frm.refresh_field("discount_amount");
   }
-
-  frm.set_value("discount_amount", total_discount_amount);
-  frm.refresh_field("discount_amount");
 }
 
 function recalculate_totals(frm) {
