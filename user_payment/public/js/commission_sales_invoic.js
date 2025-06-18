@@ -22,7 +22,8 @@ frappe.ui.form.on("Sales Invoice", {
     const current_user = frappe.session.user;
     frm.set_value("sales_person", current_user);
     if (frm.doc.is_cash) {
-      add_payment_row(frm);
+      // add_payment_row(frm);
+      frm.set_value("payment_method", "Cash");
     }
 
     frappe.call({
@@ -71,12 +72,14 @@ frappe.ui.form.on("Sales Invoice", {
     if (frm.doc.is_cash) {
       // Enable POS mode for immediate payment processing
       frm.set_value("is_pos", 1);
+      frm.set_value("payment_method", "Cash");
       // add_payment_row(frm);
     } else {
       // Reset fields when "Is Cash" is unchecked
       frm.set_value("is_pos", 0);
       frm.clear_table("payments");
       frm.refresh_field("payments");
+      frm.set_value("payment_method", "Not Cash");
     }
   },
   grand_total(frm) {
