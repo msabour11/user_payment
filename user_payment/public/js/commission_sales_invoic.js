@@ -20,6 +20,7 @@ frappe.ui.form.on("Sales Invoice", {
     // add sales person and fixed rate from sales person doctype
 
     const current_user = frappe.session.user;
+    frm.set_value("sales_person", current_user);
     if (frm.doc.is_cash) {
       add_payment_row(frm);
     }
