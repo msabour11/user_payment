@@ -231,41 +231,64 @@ function add_payment_row(frm) {
   // Clear existing payment rows
   frm.clear_table("payments");
   // Try to get user's cash account
+  // frappe.db.get_value(
+  //   "Account",
+  //   { custom_user: frappe.session.user, account_type: "Cash" },
+  //   "name",
+  //   function (r) {
+  //     const user_cash_account = r && r.name;
+  //     if (user_cash_account) {
+  //       // Add payment row with user's cash account
+  //       frm.add_child("payments", {
+  //         mode_of_payment: "نقد", // Standard mode of payment
+  //         account: user_cash_account,
+  //         amount: frm.doc.rounded_total,
+  //       });
+  //       frm.refresh_field("payments");
+  //     }
+  //     else {
+  //       // Fallback to default cash mode of payment from Company
+  //       frappe.db.get_value(
+  //         "Company",
+  //         frm.doc.company,
+  //         "default_cash_account",
+  //         function (r) {
+  //           const default_mop = r && r.default_cash_account;
+  //           if (default_mop) {
+  //             frm.add_child("payments", {
+  //               mode_of_payment: "نقد", // Standard mode of payment
+  //               account: default_mop,
+  //               amount: frm.doc.rounded_total,
+  //             });
+  //             frm.refresh_field("payments");
+  //           } else {
+  //             frappe.msgprint(
+  //               "Please set a Default Cash Mode of Payment in Company settings or link a cash account to the user."
+  //             );
+  //           }
+  //         }
+  //       );
+  //     }
+  //   }
+  // );
+
+  // Fallback to default cash mode of payment from Company
   frappe.db.get_value(
-    "Account",
-    { custom_user: frappe.session.user, account_type: "Cash" },
-    "name",
+    "Company",
+    frm.doc.company,
+    "default_cash_account",
     function (r) {
-      const user_cash_account = r && r.name;
-      if (user_cash_account) {
-        // Add payment row with user's cash account
+      const default_mop = r && r.default_cash_account;
+      if (default_mop) {
         frm.add_child("payments", {
           mode_of_payment: "نقد", // Standard mode of payment
-          account: user_cash_account,
+          account: default_mop,
           amount: frm.doc.rounded_total,
         });
         frm.refresh_field("payments");
       } else {
-        // Fallback to default cash mode of payment from Company
-        frappe.db.get_value(
-          "Company",
-          frm.doc.company,
-          "default_cash_account",
-          function (r) {
-            const default_mop = r && r.default_cash_account;
-            if (default_mop) {
-              frm.add_child("payments", {
-                mode_of_payment: "نقد", // Standard mode of payment
-                account: default_mop,
-                amount: frm.doc.rounded_total,
-              });
-              frm.refresh_field("payments");
-            } else {
-              frappe.msgprint(
-                "Please set a Default Cash Mode of Payment in Company settings or link a cash account to the user."
-              );
-            }
-          }
+        frappe.throw(
+          "Please set a Default Cash Mode of Payment in Company settings or link a cash account to the user."
         );
       }
     }
