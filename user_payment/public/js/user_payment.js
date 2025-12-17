@@ -77,8 +77,8 @@ frappe.ui.form.on("Payment Entry", {
       frm.user_account && // Only apply if user has a linked account
       (frm.doc.mode_of_payment === "Cash" ||
         frm.doc.mode_of_payment === "نقد" ||
-        frm.doc.mode_of_payment === "حوالة مصرفية" ||
-        frm.doc.mode_of_payment === "Wire Transfer")
+        frm.doc.mode_of_payment === "حوالة مصرفية الراجحي662" ||
+        frm.doc.mode_of_payment === "حوالة  مصرفية الراجحي 665")
     ) {
       frm.set_value("paid_to", frm.user_account);
     }
